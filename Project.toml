@@ -1,0 +1,8 @@
+name = "Markdownify"
+uuid = "b84430d0-6a52-11e9-3f98-1ffaac6ea750"
+authors = ["Maria Angela Pellegrino <mariaangelapellegrino94@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
