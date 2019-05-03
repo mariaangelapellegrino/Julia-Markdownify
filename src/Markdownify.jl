@@ -1,16 +1,27 @@
+__precompile__()
+
 module Markdownify
 
 using PyCall
-#using regex
 using Conda
 
 export markdownify
 export strip
 export MarkdownifyOptions
 
-bs4 = pyimport_conda("bs4", "bs4")
-re = pyimport_conda("re", "re")
-six = pyimport_conda("six", "six")
+const bs4 = PyNULL()
+const re = PyNULL()
+const six = PyNULL()
+
+#bs4 = pyimport_conda("bs4", "bs4")
+#re = pyimport_conda("re", "re")
+#six = pyimport_conda("six", "six")
+
+function __init__()
+    copy!(bs4, pyimport_conda("bs4", "bs4"))
+    copy!(re, pyimport_conda("re", "re"))
+    copy!(six, pyimport_conda("six", "six"))
+end
 
 heading_re = r"convert_h[0-9]+"
 # occursin(heading_re, "convert_h5") # test
@@ -67,7 +78,7 @@ function checkOptions(options::Union{MarkdownifyOptions,Nothing})
 end
 
 function convert(html::String)
-    bs4 = pyimport_conda("bs4", "bs4")
+    copy!(bs4, pyimport_conda("bs4", "bs4"))
 
     html = wrap(html)
     soup = bs4.BeautifulSoup(html, "html.parser")
@@ -77,7 +88,7 @@ end
 function manage_heading(attr)
     # Handle headings
     #m = occursin(heading_re,attr)
-    re = pyimport_conda("re", "re")
+    copy!(re, pyimport_conda("re", "re"))
 
     m = match(r"^h(?<n>\d)", attr)
     if m != nothing
@@ -276,8 +287,8 @@ function convert_img(el, text)
 end
 
 function process_tag(node, children_only)
-    re = pyimport_conda("re", "re")
-    six = pyimport_conda("six", "six")
+    copy!(re, pyimport_conda("re", "re"))
+    copy!(six, pyimport_conda("six", "six"))
 
     text = ""
     # Convert the children first

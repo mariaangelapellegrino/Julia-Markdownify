@@ -8,7 +8,8 @@ notifications:
   email: false
 after_success:
   - julia -e 'using Pkg; cd(Pkg.dir("Markdownify")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())';
-env: PYTHON=""
+env:
+  - PYTHON=""
 jobs:
   include:
     - stage: "Documentation"
