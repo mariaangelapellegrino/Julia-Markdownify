@@ -10,6 +10,13 @@ after_success:
   - julia -e 'using Pkg; cd(Pkg.dir("Markdownify")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())';
 env:
   - PYTHON=""
+addons:
+  apt:
+    packages:
+      - bs4
+      - re
+      - six
+
 jobs:
   include:
     - stage: "Documentation"

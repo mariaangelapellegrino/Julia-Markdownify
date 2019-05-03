@@ -18,7 +18,7 @@ const six = PyNULL()
 #six = pyimport_conda("six", "six")
 
 function __init__()
-    copy!(bs4, pyimport_conda("bs4", "bs4", "conda-forge"))
+    copy!(bs4, pyimport_conda("bs4", "bs4", "rsmulktis"))
     copy!(re, pyimport_conda("re", "re", "conda-forge"))
     copy!(six, pyimport_conda("six", "six", "conda-forge"))
 end
@@ -78,7 +78,7 @@ function checkOptions(options::Union{MarkdownifyOptions,Nothing})
 end
 
 function convert(html::String)
-    copy!(bs4, pyimport_conda("bs4", "bs4", "conda-forge"))
+    copy!(bs4, pyimport_conda("bs4", "bs4", "rsmulktis"))
 
     html = wrap(html)
     soup = bs4.BeautifulSoup(html, "html.parser")
