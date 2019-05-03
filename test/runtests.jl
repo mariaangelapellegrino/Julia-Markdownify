@@ -1,12 +1,84 @@
+using PyCall
 using Test, Markdownify
-
 #setup code
 
-@testset "Test 1" begin
-    @test 4 == 2+2
-    @test_throws DomainError (-1)^0.5
+@testset "Test Basic" begin
+    @test markdownify("<span>Hello</span>",nothing) == "Hello"
+    #@test markdownify("<div><span>Hello</div></span>", nothing) == "Hello"
+    @test markdownify(" a  b \n\n c ", nothing) == " a b c "
 end;
 
-@testset "Test 2" begin
-    @test 1+1 == 2
+@testset "Test Conversions" begin
+    @test markdownify("<i>Hello</i>",nothing) == "*Hello*"
+    @test markdownify("<em>Hello</em>",nothing) == "*Hello*"
+
+    @test markdownify("<b>Hello</b>",nothing) == "**Hello**"
+    @test markdownify("<strong>Hello</strong>",nothing) == "**Hello**"
+
+    @test markdownify("<p>Hello</p>",nothing) == "Hello\n\n"
+
+    @test markdownify("<a href='http://google.com'>Google</a>",nothing) == "[Google](http://google.com)"
+    @test markdownify("<a href='http://google.com'>http://google.com</a>",nothing) == "<http://google.com>"
+    @test markdownify("<a href='http://google.com'>http://google.com</a>",MarkdownifyOptions(nothing, nothing, false, "underlined", "*+-")) == "[http://google.com](http://google.com)"
+
+    @test strip(markdownify("<blockquote>Hello</blockquote>", nothing)) == "> Hello"
+
+    @test markdownify("a<br />b<br />c", nothing) == "a  \nb  \nc"
+
+    @test markdownify("<h1>Hello</h1>", nothing) == "Hello\n=====\n\n"
+    @test markdownify("<h1>Hello</h1>", MarkdownifyOptions(nothing, nothing, false, "atx_closed", "*+-")) == "# Hello #\n\n"
+    @test markdownify("<h2>Hello</h2>", nothing) == "Hello\n-----\n\n"
+    @test markdownify("<h2>Hello</h2>", MarkdownifyOptions(nothing, nothing, false, "atx_closed", "*+-")) == "## Hello ##\n\n"
+    @test markdownify("<h3>Hello</h3>", nothing) == "### Hello\n\n"
+    @test markdownify("<h6>Hello</h6>", nothing) == "###### Hello\n\n"
+
+    @test markdownify("<ol><li>a</li><li>b</li></ol>", nothing) == "1. a\n2. b\n"
+    @test markdownify("<ul><li>a</li><li>b</li></ul>", nothing) == "* a\n* b\n"
+
+    nested_uls = "
+        <ul>
+            <li>1
+                <ul>
+                    <li>a
+                        <ul>
+                            <li>I</li>
+                            <li>II</li>
+                            <li>III</li>
+                        </ul>
+                    </li>
+                    <li>b</li>
+                    <li>c</li>
+                </ul>
+            </li>
+            <li>2</li>
+            <li>3</li>
+        </ul>"
+    nested_uls = replace(nested_uls, r"\s+"=>"")
+
+    #TODO @test markdownify(nested_uls, nothing) == "* 1\n\t+ a\n\t\t- I\n\t\t- II\n\t\t- III\n\t\t\n\t+ b\n\t+ c\n\t\n* 2\n* 3\n"
+
+    @test markdownify("<img src='/path/to/img.jpg' alt='Alt text' title='Optional title' />", nothing) == "![Alt text](/path/to/img.jpg 'Optional title')"
+    @test markdownify("<img src='/path/to/img.jpg' alt='Alt text' />", nothing) == "![Alt text](/path/to/img.jpg)"
+
+end;
+
+#=@testset "Test Escaping" begin
+    @test markdownify("_hey_dude_", nothing) == "\_hey\_dude\_"
+    @test markdownify("&amp;",nothing) == "&"
+    @test markdownify("&raquo;",nothing) == "\xbb"
+    @test markdownify("&#x27;",nothing) == "\x27"
+    @test markdownify("&amp;amp;",nothing) == "&amp;"
+
+end;
+=#
+
+@testset "Test Args" begin
+    @test markdownify("<a href='https://github.com/matthewwithanm'>Some Text</a>", MarkdownifyOptions(["a"], nothing, false, "underlined", "*+-"))== "Some Text"
+    @test markdownify("<a href='https://github.com/matthewwithanm'>Some Text</a>", MarkdownifyOptions([], nothing, false, "underlined", "*+-")) == "[Some Text](https://github.com/matthewwithanm)"
+    @test markdownify("<a href='https://github.com/matthewwithanm'>Some Text</a>", MarkdownifyOptions(nothing, ["a"], false, "underlined", "*+-"))== "[Some Text](https://github.com/matthewwithanm)"
+    @test markdownify("<a href='https://github.com/matthewwithanm'>Some Text</a>", MarkdownifyOptions(nothing, [], false, "underlined", "*+-"))== "Some Text"
+end;
+
+@testset "Test Nested" begin
+    @test markdownify("<p>This is an <a href='http://example.com/'>example link</a>.</p>",nothing) == "This is an [example link](http://example.com/).\n\n"
 end;
