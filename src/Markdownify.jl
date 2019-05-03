@@ -18,9 +18,9 @@ const six = PyNULL()
 #six = pyimport_conda("six", "six")
 
 function __init__()
-    copy!(bs4, pyimport_conda("bs4", "bs4"))
-    copy!(re, pyimport_conda("re", "re"))
-    copy!(six, pyimport_conda("six", "six"))
+    copy!(bs4, pyimport_conda("bs4", "bs4", "conda-forge"))
+    copy!(re, pyimport_conda("re", "re", "conda-forge"))
+    copy!(six, pyimport_conda("six", "six", "conda-forge"))
 end
 
 heading_re = r"convert_h[0-9]+"
@@ -78,7 +78,7 @@ function checkOptions(options::Union{MarkdownifyOptions,Nothing})
 end
 
 function convert(html::String)
-    copy!(bs4, pyimport_conda("bs4", "bs4"))
+    copy!(bs4, pyimport_conda("bs4", "bs4", "conda-forge"))
 
     html = wrap(html)
     soup = bs4.BeautifulSoup(html, "html.parser")
@@ -88,7 +88,7 @@ end
 function manage_heading(attr)
     # Handle headings
     #m = occursin(heading_re,attr)
-    copy!(re, pyimport_conda("re", "re"))
+    copy!(re, pyimport_conda("re", "re", "conda-forge"))
 
     m = match(r"^h(?<n>\d)", attr)
     if m != nothing
@@ -287,8 +287,8 @@ function convert_img(el, text)
 end
 
 function process_tag(node, children_only)
-    copy!(re, pyimport_conda("re", "re"))
-    copy!(six, pyimport_conda("six", "six"))
+    copy!(re, pyimport_conda("re", "re", "conda-forge"))
+    copy!(six, pyimport_conda("six", "six", "conda-forge"))
 
     text = ""
     # Convert the children first
