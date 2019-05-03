@@ -16,7 +16,7 @@ export MarkdownifyOptions
 #six = pyimport_conda("six", "six")
 
 function __init__()
-    copy!(bs4, pyimport_conda("bs4", "bs4", "rsmulktis"))
+    copy!(bs4, pyimport_conda("bs4", "beautifulsoup4", "rsmulktis"))
     copy!(re, pyimport_conda("re", "re", "conda-forge"))
     copy!(six, pyimport_conda("six", "six", "conda-forge"))
 end

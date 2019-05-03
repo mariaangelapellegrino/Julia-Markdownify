@@ -35,7 +35,7 @@ function checkOptions(options::Union{MarkdownifyOptions,Nothing})
 end
 
 function convert(html::String)
-    copy!(bs4, pyimport_conda("bs4", "bs4", "rsmulktis"))
+    copy!(bs4, pyimport_conda("bs4", "beautifulsoup4", "rsmulktis"))
 
     html = wrap(html)
     soup = bs4.BeautifulSoup(html, "html.parser")
