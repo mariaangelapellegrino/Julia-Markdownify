@@ -13,9 +13,9 @@ env:
 addons:
   apt:
     packages:
-      - python2-bs4
-      - python2-six
-      - python2-re
+      - python-bs4
+      - python-six
+      - python-re
 jobs:
   include:
     - stage: "Documentation"
