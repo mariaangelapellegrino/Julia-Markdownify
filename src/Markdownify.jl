@@ -1,3 +1,6 @@
+"""
+
+"""
 module Markdownify
 
 using PyCall
@@ -10,10 +13,6 @@ const six = PyNULL()
 export markdownify
 export strip
 export MarkdownifyOptions
-
-#bs4 = pyimport_conda("bs4", "bs4")
-#re = pyimport_conda("re", "re")
-#six = pyimport_conda("six", "six")
 
 function __init__()
     copy!(bs4, pyimport_conda("bs4", "beautifulsoup4", "rsmulktis"))
@@ -33,6 +32,4 @@ struct MarkdownifyOptions
 end
 
 include("translator.jl")
-
-test = markdownify("&amp;amp;", nothing)
 end # module

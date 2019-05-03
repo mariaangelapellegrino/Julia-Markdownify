@@ -4,7 +4,6 @@ using Test, Markdownify
 
 @testset "Test Basic" begin
     @test markdownify("<span>Hello</span>",nothing) == "Hello"
-    #@test markdownify("<div><span>Hello</div></span>", nothing) == "Hello"
     @test markdownify(" a  b \n\n c ", nothing) == " a b c "
 end;
 
@@ -62,15 +61,13 @@ end;
 
 end;
 
-#=@testset "Test Escaping" begin
-    @test markdownify("_hey_dude_", nothing) == "\_hey\_dude\_"
+@testset "Test Escaping" begin
+    @test markdownify("_hey_dude_", nothing) == "\\_hey\\_dude\\_"
     @test markdownify("&amp;",nothing) == "&"
-    @test markdownify("&raquo;",nothing) == "\xbb"
-    @test markdownify("&#x27;",nothing) == "\x27"
     @test markdownify("&amp;amp;",nothing) == "&amp;"
 
 end;
-=#
+
 
 @testset "Test Args" begin
     @test markdownify("<a href='https://github.com/matthewwithanm'>Some Text</a>", MarkdownifyOptions(["a"], nothing, false, "underlined", "*+-"))== "Some Text"

@@ -3,7 +3,12 @@ tag_re = r"[<.+?>]"
 whitespace_re = r"[\r\n\s\t ]+"
 
 FRAGMENT_ID = "__MARKDOWNIFY_WRAPPER__"
-function wrap(html)
+"""
+    wrap(html::AbstractString)
+
+It wraps the hmtl provided as input into a div and returns it.
+"""
+function wrap(html::AbstractString)
     return "<div id="*FRAGMENT_ID*">"*html*"</div>"
 end
 
@@ -15,11 +20,16 @@ function escape_char(c)
 end
 function escape(text)
     #return join([escape_char(c) for c in text])
-    return replace(text, "_" => r"\_")
+    return replace(text, "_" => "\\_")
 end
 
 actual_options = nothing
-
+"""
+    checkOptions(options::Union{MarkdownifyOptions,Nothing})
+If a MarkdownifyOptions is provided
+    it checks if the parameters are correctly set,
+otherwise it sets a default options.
+"""
 function checkOptions(options::Union{MarkdownifyOptions,Nothing})
     if options != nothing
         if options.strip!=nothing && options.convert!=nothing
@@ -33,16 +43,22 @@ function checkOptions(options::Union{MarkdownifyOptions,Nothing})
         global actual_options = MarkdownifyOptions(nothing, nothing, true, "underlined", "*+-")
     end
 end
-
-function convert(html::String)
+"""
+    convert(html::AbstractString)
+It converts the html string into a xml object.
+"""
+function convert(html::AbstractString)
     copy!(bs4, pyimport_conda("bs4", "beautifulsoup4", "rsmulktis"))
 
     html = wrap(html)
     soup = bs4.BeautifulSoup(html, "html.parser")
     process_tag(soup.find(id=FRAGMENT_ID), true)
 end
-
-function manage_heading(attr)
+"""
+    manage_heading(attr::AbstractString)
+It checks if the input is an heading attribute and return the function to call in order to manage it.
+"""
+function manage_heading(attr::AbstractString)
     # Handle headings
     #m = occursin(heading_re,attr)
     copy!(re, pyimport_conda("re", "re", "conda-forge"))
@@ -50,18 +66,14 @@ function manage_heading(attr)
     m = match(r"^h(?<n>\d)", attr)
     if m != nothing
         n = m[:n]
-
-        #function convert_tag(el, text)
-        #    convert_hn(n, el, text)
-        #end
-
-        #convert_tag.__name__ = "convert_h"*n
-        #setattr(convert_tag.__name__, convert_tag)
         return "convert_hn"
     end
 end
-
-function should_convert_tag(tag)
+"""
+    should_convert_tag(tag::AbstractString)
+It verifies if the tag has to be managed or not based on the parameters.
+"""
+function should_convert_tag(tag::AbstractString)
     tag = lowercase(tag)
     strip = actual_options.strip
     convert = actual_options.convert
@@ -73,14 +85,20 @@ function should_convert_tag(tag)
         return true
     end
 end
-
-function indent(text::String, level::Integer)
+"""
+    indent(text::AbstractString, level::Int)
+If text is not empty, it returns as many tabulations as the level parameters folowed by the text provided as input.
+"""
+function indent(text::AbstractString, level::Int)
     if isempty(text)
         return ""
     end
     return replace(text, r"^" => "\t"^level)
 end
-
+"""
+    underline(text::AbstractString, pad_char::AbstractString)
+If text is not empty, it returns the text underlined by the pad_char.
+"""
 function underline(text::AbstractString, pad_char::AbstractString)
     text = rstrip(text)
     if isempty(text)
@@ -89,8 +107,11 @@ function underline(text::AbstractString, pad_char::AbstractString)
 
     return text*"\n"*(pad_char^length(text))*"\n\n"
 end
-
-function convert_a(el, text)
+"""
+    convert_a(el, text::AbstractString)
+It converts the tag <a> into either <href> or [text](href title) based on the parameters.
+"""
+function convert_a(el, text::AbstractString)
     href = el.get("href")
     title = el.get("title")
     if actual_options.autolinks && text==href && title==nothing
@@ -107,25 +128,38 @@ function convert_a(el, text)
 
     return "["*text*"]("*href*title_part*")"
 end
-
-function convert_b(el, text)
+"""
+    convert_b(el, text::AbstractString)
+It converts text into **text**.
+"""
+function convert_b(el, text::AbstractString)
     return convert_strong(el, text)
 end
 
-function convert_blockquote(el, text)
+"""
+
+"""
+function convert_blockquote(el, text::AbstractString)
     #'\n' + line_beginning_re.sub('> ', text) if text else ''
     if text == nothing
-        return "\n"*""
-    else
-        return "\n"*replace(text, r"^" => "> ")
+        text = ""
     end
+    return "\n"*replace(text, r"^" => "> ")
 end
 
-function convert_br(el, text)
+"""
+    convert_br(el, text::AbstractString)
+It converts <br> into "\n"
+"""
+function convert_br(el, text::AbstractString)
     return "  \n"
 end
 
-function convert_em(el, text)
+"""
+    convert_em(el, text::AbstractString)
+It converts text into *text*.
+"""
+function convert_em(el, text::AbstractString)
     if text == nothing
         return ""
     else
@@ -133,7 +167,11 @@ function convert_em(el, text)
     end
 end
 
-function convert_hn(el, text)
+"""
+    convert_hn(el, text::AbstractString)
+It renders the heading based on the heading tag and the parameters.
+"""
+function convert_hn(el, text::AbstractString)
     m = match(r"^h(?<n>\d)", el.name)
     n = parse(Int8, m[:n])
 
@@ -155,11 +193,19 @@ function convert_hn(el, text)
     return hashes*" "*text*"\n\n"
 end
 
-function convert_i(el, text)
+"""
+    convert_i(el, text::AbstractString)
+It converts text into *text*.
+"""
+function convert_i(el, text::AbstractString)
     return convert_em(el, text)
 end
 
-function convert_list(el, text)
+"""
+    convert_list(el, text::AbstractString)
+It converts the list tag into a Markdown list.
+"""
+function convert_list(el, text::AbstractString)
     nested = false
     while el!=nothing
         if el.name == "li"
