@@ -52,6 +52,7 @@ end;
 
 
 @testset "Test Args" begin
+    @test markdownify("<span>Hello</span>",MarkdownifyOptions()) == "Hello"
     @test markdownify("<a href='https://github.com/matthewwithanm'>Some Text</a>", MarkdownifyOptions(["a"], nothing, false, "underlined", "*+-"))== "Some Text"
     @test markdownify("<a href='https://github.com/matthewwithanm'>Some Text</a>", MarkdownifyOptions([], nothing, false, "underlined", "*+-")) == "[Some Text](https://github.com/matthewwithanm)"
     @test markdownify("<a href='https://github.com/matthewwithanm'>Some Text</a>", MarkdownifyOptions(nothing, ["a"], false, "underlined", "*+-"))== "[Some Text](https://github.com/matthewwithanm)"

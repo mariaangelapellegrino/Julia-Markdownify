@@ -9,6 +9,16 @@ It models Markdownify options in order to customize the markdown in output.
 * `autolinks` : boolean to determine the tag a conversion
 * `heading_style` : parameter to customize the heading style
 * `bullets` : list of symbols in order to customize the nested list conversion
+
+**Constructors**
+It is possible to specify all the parameters or use the default for all of them.
+Default parameters are:
+* `strip` : empty vector
+* `convert` : empty vector
+* `autolinks` : true
+* `heading_style` : underlined
+* `bullets` : *+-
+
 """
 
 struct MarkdownifyOptions
@@ -17,8 +27,11 @@ struct MarkdownifyOptions
     autolinks::Bool
     heading_style::AbstractString
     bullets::AbstractString
-end
 
+    MarkdownifyOptions(strip, convert, autolinks, heading_style, bullets) =
+        new(strip, convert, autolinks, heading_style, bullets)
+end
+MarkdownifyOptions() = MarkdownifyOptions(nothing, nothing, true, "underlined", "*+-")
 #=
 function MarkdownifyOptions(strip::Union{Vector{AbstractString},Nothing}, convert::Union{Vector{AbstractString},Nothing}, autolinks::Bool, heading_style::AbstractString, bullets::AbstractString)
     MarkdownifyOptions(strip, nothing, true, "underlined", "*+-")

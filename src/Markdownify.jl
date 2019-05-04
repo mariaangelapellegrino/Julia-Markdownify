@@ -23,5 +23,4 @@ end
 include("MarkdownifyOptions.jl")
 include("translator.jl")
 
- #markdownify("<div><span>Hello</div></span>",nothing)
 end # module

@@ -18,7 +18,7 @@ Functions
 markdownify(::AbstractString, ::Union{MarkdownifyOptions,Nothing})
 ```
 
-Structures
+Types
 ----------
 ```@docs
 MarkdownifyOptions
