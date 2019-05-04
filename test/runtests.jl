@@ -21,11 +21,13 @@ end;
     @test markdownify("<a href='http://google.com'>Google</a>",nothing) == "[Google](http://google.com)"
     @test markdownify("<a href='http://google.com'>http://google.com</a>",nothing) == "<http://google.com>"
     @test markdownify("<a href='http://google.com'>http://google.com</a>",MarkdownifyOptions(nothing, nothing, false, "underlined", "*+-")) == "[http://google.com](http://google.com)"
+    @test markdownify("<a href='http://google.com'title='Google'>http://google.com</a>",MarkdownifyOptions(nothing, nothing, false, "underlined", "*+-")) == "[http://google.com](http://google.com Google)"
 
     @test strip(markdownify("<blockquote>Hello</blockquote>", nothing)) == "> Hello"
 
     @test markdownify("a<br />b<br />c", nothing) == "a  \nb  \nc"
 
+    @test markdownify("<h1></h1>", nothing) == ""
     @test markdownify("<h1>Hello</h1>", nothing) == "Hello\n=====\n\n"
     @test markdownify("<h1>Hello</h1>", MarkdownifyOptions(nothing, nothing, false, "atx_closed", "*+-")) == "# Hello #\n\n"
     @test markdownify("<h2>Hello</h2>", nothing) == "Hello\n-----\n\n"
@@ -35,28 +37,6 @@ end;
 
     @test markdownify("<ol><li>a</li><li>b</li></ol>", nothing) == "1. a\n2. b\n"
     @test markdownify("<ul><li>a</li><li>b</li></ul>", nothing) == "* a\n* b\n"
-
-    nested_uls = "
-        <ul>
-            <li>1
-                <ul>
-                    <li>a
-                        <ul>
-                            <li>I</li>
-                            <li>II</li>
-                            <li>III</li>
-                        </ul>
-                    </li>
-                    <li>b</li>
-                    <li>c</li>
-                </ul>
-            </li>
-            <li>2</li>
-            <li>3</li>
-        </ul>"
-    nested_uls = replace(nested_uls, r"\s+"=>"")
-
-    #TODO @test markdownify(nested_uls, nothing) == "* 1\n\t+ a\n\t\t- I\n\t\t- II\n\t\t- III\n\t\t\n\t+ b\n\t+ c\n\t\n* 2\n* 3\n"
 
     @test markdownify("<img src='/path/to/img.jpg' alt='Alt text' title='Optional title' />", nothing) == "![Alt text](/path/to/img.jpg 'Optional title')"
     @test markdownify("<img src='/path/to/img.jpg' alt='Alt text' />", nothing) == "![Alt text](/path/to/img.jpg)"
@@ -82,4 +62,29 @@ end;
 
 @testset "Test Nested" begin
     @test markdownify("<p>This is an <a href='http://example.com/'>example link</a>.</p>",nothing) == "This is an [example link](http://example.com/).\n\n"
+
+    nested_uls = "
+        <ul>
+            <li>1
+                <ul>
+                    <li>a
+                        <ul>
+                            <li>I</li>
+                            <li>II</li>
+                            <li>III</li>
+                        </ul>
+                    </li>
+                    <li>b</li>
+                    <li>c</li>
+                </ul>
+            </li>
+            <li>2</li>
+            <li>3</li>
+        </ul>"
+    nested_uls = replace(nested_uls, r"\s+"=>"")
+
+    @test markdownify(nested_uls, nothing) == "* 1\n\t+ a\n\t\t- I\n\t\t- II\n\t\t- III\n\t\n\t+ b\n\t+ c\n\n* 2\n* 3\n"
+    @test markdownify(nested_uls, MarkdownifyOptions(nothing, nothing, true, "underlined", "-")) == "- 1\n\t- a\n\t\t- I\n\t\t- II\n\t\t- III\n\t\n\t- b\n\t- c\n\n- 2\n- 3\n"
+
+    @test strip(markdownify("<blockquote>And she was like <blockquote>Hello</blockquote></blockquote>",nothing)) == "> And she was like \n> > Hello"
 end;

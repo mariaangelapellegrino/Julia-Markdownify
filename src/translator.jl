@@ -20,7 +20,7 @@ escaping = Dict("_" => r"\_")
     return get(escaping, c, c)
 end
 =#
-function escape!(text)
+function escape(text)
     #return join([escape_char(c) for c in text])
     return replace(text, "_" => "\\_")
 end
@@ -95,7 +95,7 @@ function indent(text::AbstractString, level::Int)
     if isempty(text)
         return ""
     else
-        return replace(text, r"^" => "\t"^level)
+        return replace(text, r"^"ism => "\t"^level)
     end
 end
 """
@@ -126,7 +126,7 @@ function convert_a(el, text::AbstractString)
         title_part = ""
     else
         replace(title, '"' => r"\"")
-        title_part = title
+        title_part = " "*title
     end
 
     return "["*text*"]("*href*title_part*")"
@@ -147,7 +147,7 @@ function convert_blockquote(el, text::AbstractString)
     if text == nothing
         text = ""
     end
-    return "\n"*replace(text, r"^" => "> ")
+    return "\n"*replace(text, r"^"ism => "> ")
 end
 
 """
@@ -224,8 +224,11 @@ function convert_list(el, text::AbstractString)
 end
 convert_ul = convert_list
 convert_ol = convert_list
-
-function convert_li(el, text)
+"""
+    convert_li(el, text::AbstractString)
+It converts the li according to the parent list type.
+"""
+function convert_li(el, text::AbstractString)
     parent = el.parent
     if parent !=nothing && parent.name == "ol"
         bullet = string(parent.index(el) + 1)*"."
@@ -239,36 +242,48 @@ function convert_li(el, text)
         end
 
         bullets = actual_options.bullets
-        bullet = bullets[depth % length(bullets)+1]
+        bullet = bullets[(depth % length(bullets))+1]
     end
     return bullet*" "*text*"\n"
 end
-
-function convert_p(el, text)
+"""
+    convert_p(el, text::AbstractString)
+It converts the text into the p tag into text\n\n
+"""
+function convert_p(el, text::AbstractString)
     if text == nothing
         return ""
     else
         return text*"\n\n"
     end
 end
-
-function convert_span(el, text)
+"""
+    convert_span(el, text::AbstractString)
+It converts the text into the span tag into text.
+"""
+function convert_span(el, text::AbstractString)
     if text == nothing
         return ""
     else
         return text
     end
 end
-
-function convert_strong(el, text)
+"""
+    convert_strong(el, text::AbstractString)
+It converts the text into the strong tag into **text**
+"""
+function convert_strong(el, text::AbstractString)
     if text == nothing
         return ""
     else
         return "**"*text*"**"
     end
 end
-
-function convert_img(el, text)
+"""
+    convert_img(el, text::AbstractString)
+It converts the img tag into ![alt](src title_part).
+"""
+function convert_img(el, text::AbstractString)
     if haskey(el.attrs, "alt")
         alt = el.attrs["alt"]
     else
@@ -291,8 +306,11 @@ function convert_img(el, text)
 
     return "!["*alt*"]("*src*title_part*")"
 end
-
-function process_tag(node, children_only)
+"""
+    function process_tag(node, children_only::Bool)
+It process the tag and convert all the induced subtree into markdown.
+"""
+function process_tag(node, children_only::Bool)
     copy!(re, pyimport_conda("re", "re", "conda-forge"))
     copy!(six, pyimport_conda("six", "six", "conda-forge"))
 
@@ -320,16 +338,22 @@ function process_tag(node, children_only)
 
     return text
 end
-
-function process_text(text::String)
+"""
+    process_text(text::AbstractString)
+It escape the text and remove useless spaces.
+"""
+function process_text(text::AbstractString)
     if text!= ""
-        return escape!(replace(text, r"[\r\n\s\t ]+" => " "))
+        return escape(replace(text, r"[\r\n\s\t ]+" => " "))
     else
         return text
     end
 end
-
-function markdownify(html::String, options::Union{MarkdownifyOptions,Nothing})
+"""
+    markdownify(html::AbstractString, Options::Union{MarkdownifyOptions,Nothing})
+It converts the string html into a markdown string based on the specified options.
+"""
+function markdownify(html::AbstractString, options::Union{MarkdownifyOptions,Nothing})
     checkOptions(options)
     return convert(html)
 end

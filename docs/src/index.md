@@ -15,7 +15,7 @@ end
 Functions
 ---------
 ```@docs
-markdownify(::String, ::Union{MarkdownifyOptions,Nothing})
+markdownify(::AbstractString, ::Union{MarkdownifyOptions,Nothing})
 ```
 
 Structures
