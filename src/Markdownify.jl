@@ -11,7 +11,7 @@ const re = PyNULL()
 const six = PyNULL()
 
 export markdownify
-export strip
+#export strip
 export MarkdownifyOptions
 
 function __init__()
@@ -20,16 +20,6 @@ function __init__()
     copy!(six, pyimport_conda("six", "six", "conda-forge"))
 end
 
-# Heading styles
-HEADING_STYLES = ["atx", "atx_closed", "underlined"]
-
-struct MarkdownifyOptions
-    strip::Union{Vector{String},Nothing}
-    convert::Union{Vector{String},Nothing}
-    autolinks::Bool
-    heading_style::String
-    bullets::String
-end
-
+include("MarkdownifyOptions.jl")
 include("translator.jl")
 end # module

@@ -2,6 +2,7 @@ heading_re = r"convert_h[0-9]+"
 tag_re = r"[<.+?>]"
 whitespace_re = r"[\r\n\s\t ]+"
 
+HEADING_STYLES = ["atx", "atx_closed", "underlined"]
 FRAGMENT_ID = "__MARKDOWNIFY_WRAPPER__"
 """
     wrap(html::AbstractString)
@@ -14,11 +15,12 @@ end
 
 escaping = Dict("_" => r"\_")
 
-function escape_char(c)
+#=function escape_char(c)
     print(escaping["_"])
     return get(escaping, c, c)
 end
-function escape(text)
+=#
+function escape!(text)
     #return join([escape_char(c) for c in text])
     return replace(text, "_" => "\\_")
 end
@@ -33,9 +35,9 @@ otherwise it sets a default options.
 function checkOptions(options::Union{MarkdownifyOptions,Nothing})
     if options != nothing
         if options.strip!=nothing && options.convert!=nothing
-            throw("You may specify either tags to strip or tags to convert, but not both.")
-        elseif !(actual_options.heading_style in HEADING_STYLES)
-            throw("The specified heading style is not valid. ")
+            throw(Exception("You may specify either tags to strip or tags to convert, but not both."))
+        elseif !(options.heading_style in HEADING_STYLES)
+            throw(Exception("The specified heading style is not valid. "))
         else
             global actual_options = options
         end
@@ -92,8 +94,9 @@ If text is not empty, it returns as many tabulations as the level parameters fol
 function indent(text::AbstractString, level::Int)
     if isempty(text)
         return ""
+    else
+        return replace(text, r"^" => "\t"^level)
     end
-    return replace(text, r"^" => "\t"^level)
 end
 """
     underline(text::AbstractString, pad_char::AbstractString)
@@ -320,7 +323,7 @@ end
 
 function process_text(text::String)
     if text!= ""
-        return escape(replace(text, r"[\r\n\s\t ]+" => " "))
+        return escape!(replace(text, r"[\r\n\s\t ]+" => " "))
     else
         return text
     end

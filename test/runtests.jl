@@ -8,6 +8,8 @@ using Test, Markdownify
 end;
 
 @testset "Test Conversions" begin
+    @test markdownify("",nothing) == ""
+
     @test markdownify("<i>Hello</i>",nothing) == "*Hello*"
     @test markdownify("<em>Hello</em>",nothing) == "*Hello*"
 
@@ -74,6 +76,8 @@ end;
     @test markdownify("<a href='https://github.com/matthewwithanm'>Some Text</a>", MarkdownifyOptions([], nothing, false, "underlined", "*+-")) == "[Some Text](https://github.com/matthewwithanm)"
     @test markdownify("<a href='https://github.com/matthewwithanm'>Some Text</a>", MarkdownifyOptions(nothing, ["a"], false, "underlined", "*+-"))== "[Some Text](https://github.com/matthewwithanm)"
     @test markdownify("<a href='https://github.com/matthewwithanm'>Some Text</a>", MarkdownifyOptions(nothing, [], false, "underlined", "*+-"))== "Some Text"
+    @test_throws Exception markdownify("<a href='https://github.com/matthewwithanm'>Some Text</a>", MarkdownifyOptions([], [], false, "underlined", "*+-"))
+    @test_throws Exception markdownify("<a href='https://github.com/matthewwithanm'>Some Text</a>", MarkdownifyOptions(nothing, [], false, "not exist", "*+-"))
 end;
 
 @testset "Test Nested" begin
